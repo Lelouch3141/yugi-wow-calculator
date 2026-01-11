@@ -12,8 +12,8 @@ const EQUAL_COLOR = "red";
 const LIFE_WIDTH = "175px";
 const LIFE_HEIGHT = "60px";
 
-const life2Sound = new SoundUtils(`src/sounds/life2.mp3`);
-const gameoverSound = new SoundUtils(`src/sounds/gameover.mp3`);
+const life2Sound = new SoundUtils(`/sounds/life2.mp3`);
+const gameoverSound = new SoundUtils(`/sounds/gameover.mp3`);
 
 // type operators = "devide" | "product" | "minus" | "plus" | "mod";
 const operators = {
