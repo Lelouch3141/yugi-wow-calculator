@@ -112,9 +112,9 @@ const EqualButton = (props: EqualButtonProps) => {
   );
 };
 
-const Blank = () => {
-  return <Box height={CALC_BUTTON_HEIGHT} width={CALC_BUTTON_HEIGHT}></Box>;
-};
+// const Blank = () => {
+//   return <Box height={CALC_BUTTON_HEIGHT} width={CALC_BUTTON_HEIGHT}></Box>;
+// };
 
 interface PlayerLifeProps {
   onClickPlayerLife?: (playerIndex: number) => void;
