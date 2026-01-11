@@ -1,8 +1,9 @@
 import { Button, HStack, Text, Box, VStack, Spacer } from "@chakra-ui/react";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { SoundUtils } from "./utils/sound-utils";
 import ConfirmModal from "./ConfirmModal";
-import SoundModal from "./SoundModal";
+import SoundModal, { Sound } from "./SoundModal";
+import PlayPauseButton from "./PlayPauseButton";
 
 const CALC_BUTTON_HEIGHT = "80px";
 const NUMBER_COLOR = "blue";
@@ -193,6 +194,45 @@ const Calculator = () => {
   const [isConfirmModal, setIsConfirmModal] = useState(false);
   const [isSoundModal, setIsSoundModal] = useState(false);
 
+  const [activeSound, setActiveSound] = useState<SoundUtils | null>(null);
+  const [activeSoundInfo, setActiveSoundInfo] = useState<{
+    title: string;
+    path: string;
+  } | null>(null);
+  const [isPlaying, setIsPlaying] = useState(false);
+
+  useEffect(() => {
+    if (previousValue.some((life) => life === "0")) {
+      setIsConfirmModal(true);
+    }
+  }, [previousValue]);
+
+  const togglePlayback = () => {
+    if (!activeSound) return;
+
+    if (isPlaying) {
+      activeSound.pauseAudio();
+    } else {
+      activeSound.playAudio();
+    }
+    setIsPlaying(!isPlaying);
+  };
+
+  const handleSelectAndPlay = (sound: Sound) => {
+    if (activeSoundInfo?.path !== sound.path) {
+      activeSound?.stopAudio();
+
+      const newSound = new SoundUtils(sound.path, () => setIsPlaying(false));
+      newSound.playAudio();
+
+      setActiveSound(newSound);
+      setActiveSoundInfo({ title: sound.displayName, path: sound.path });
+      setIsPlaying(true);
+    } else {
+      togglePlayback();
+    }
+  };
+
   const onChangePlayerIndex = (num: number) => {
     console.log(`num_${num}`);
     setPlayerIndex(num);
@@ -208,7 +248,7 @@ const Calculator = () => {
     ) {
       return;
     }
-    if ((currentValue + num).length > 8) {
+    if ((currentValue + num).length > 6) {
       return;
     }
     setCurrentValue(currentValue + num);
@@ -273,7 +313,7 @@ const Calculator = () => {
 
   const onClickEqualButton = () => {
     if (
-      !(previousValue[playerIndex] && currentValue[playerIndex]) ||
+      !(previousValue[playerIndex] && currentValue) ||
       !operator
     ) {
       return;
@@ -321,7 +361,7 @@ const Calculator = () => {
 
         <HStack
           borderBottom="3px solid gray"
-          width="184px"
+          width="158px"
           height="30px"
           fontSize={"30px"}
         >
@@ -339,26 +379,25 @@ const Calculator = () => {
           </HStack>
           <HStack>
             <VStack>
-               <HStack>
-              <NumberButton num="4" onClickNum={onClickNumButton} />
-              <NumberButton num="5" onClickNum={onClickNumButton} />
-              <NumberButton num="6" onClickNum={onClickNumButton} />
-            </HStack>
-            <HStack>
-              <NumberButton num="1" onClickNum={onClickNumButton} />
-              <NumberButton num="2" onClickNum={onClickNumButton} />
-              <NumberButton num="3" onClickNum={onClickNumButton} />
-            </HStack>
-            <HStack>
-              <NumberButton num="0" onClickNum={onClickNumButton} />
-              <NumberButton num="00" onClickNum={onClickNumButton} />
-              <NumberButton num="000" onClickNum={onClickNumButton} />
-            </HStack>
+              <HStack>
+                <NumberButton num="4" onClickNum={onClickNumButton} />
+                <NumberButton num="5" onClickNum={onClickNumButton} />
+                <NumberButton num="6" onClickNum={onClickNumButton} />
+              </HStack>
+              <HStack>
+                <NumberButton num="1" onClickNum={onClickNumButton} />
+                <NumberButton num="2" onClickNum={onClickNumButton} />
+                <NumberButton num="3" onClickNum={onClickNumButton} />
+              </HStack>
+              <HStack>
+                <NumberButton num="0" onClickNum={onClickNumButton} />
+                <NumberButton num="00" onClickNum={onClickNumButton} />
+                <NumberButton num="000" onClickNum={onClickNumButton} />
+              </HStack>
             </VStack>
-             
+
             <EqualButton onClickEqualButton={onClickEqualButton} />
           </HStack>
-          
         </VStack>
         {/* <HStack>
           <ClearButton onClickClearButton={onClickClearButton} />
@@ -378,7 +417,20 @@ const Calculator = () => {
             operator={operators.devide}
             onClickOperator={onClickOperatorButton}
           />
-          <Blank/>
+          <Box
+            height={CALC_BUTTON_HEIGHT}
+            width={CALC_BUTTON_HEIGHT}
+            display="flex"
+            alignItems="center"
+            justifyContent="center"
+          >
+            <PlayPauseButton
+              onClick={togglePlayback}
+              isPlaying={isPlaying}
+              width={CALC_BUTTON_HEIGHT}
+              height={CALC_BUTTON_HEIGHT}
+            />
+          </Box>
         </HStack>
         <HStack>
           <Button
@@ -400,6 +452,9 @@ const Calculator = () => {
             }}
           />
         </HStack>
+        <Text fontSize="sm" height="20px">
+          {"music: " + activeSoundInfo?.title || "No sound selected"}
+        </Text>
       </VStack>
       <ConfirmModal
         isOpen={isConfirmModal}
@@ -429,9 +484,13 @@ const Calculator = () => {
         onClickCloseButton={() => {
           setIsSoundModal(false);
         }}
+        handleSelectAndPlay={handleSelectAndPlay}
+        activeSoundInfo={activeSoundInfo}
+        isPlaying={isPlaying}
       />
     </>
   );
 };
 
 export default Calculator;
+

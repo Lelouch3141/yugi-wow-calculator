@@ -31,6 +31,17 @@ export class SoundUtils {
   }
 
   /**
+   * 音声ファイルの一時停止
+   */
+  pauseAudio(): void {
+    try {
+      this.sound.pause();
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  /**
    * 音声ファイルの再生停止
    */
   stopAudio(): void {
@@ -39,5 +50,16 @@ export class SoundUtils {
     } catch (e) {
       console.error(e);
     }
+  }
+
+  /**
+   * 再生中かどうか
+   */
+  isPlaying(): boolean {
+    return this.sound.playing();
+  }
+
+  getSrc(): string {
+    return this.audioPath;
   }
 }

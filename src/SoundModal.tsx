@@ -16,16 +16,11 @@ import {
 } from "@chakra-ui/react";
 import PlayPauseButton from "./PlayPauseButton";
 
-interface SoundModalProps {
-  isOpen: boolean;
-  onClickCloseButton?: () => void;
-}
-
-interface Sound {
+export interface Sound {
   displayName: string;
   path: string;
 }
-const soundList: Sound[] = [
+export const soundList: Sound[] = [
   { displayName: "熱き決闘者たち", path: `src/sounds/atsuki_duelists.mp3` },
   { displayName: "神の怒り", path: `src/sounds/god.mp3` },
   { displayName: "十代のテーマ", path: `src/sounds/gx.mp3` },
@@ -56,8 +51,16 @@ const soundList: Sound[] = [
   { displayName: "ユニコォォォォオオン", path: `src/sounds/unicorn.mp3` },
 ];
 
+interface SoundModalProps {
+  isOpen: boolean;
+  onClickCloseButton?: () => void;
+  handleSelectAndPlay: (sound: Sound) => void;
+  activeSoundInfo: { title: string; path: string } | null;
+  isPlaying: boolean;
+}
+
 const SoundModal = (props: SoundModalProps) => {
-  const { isOpen } = props;
+  const { isOpen, activeSoundInfo, isPlaying, handleSelectAndPlay } = props;
   const { onClose } = useDisclosure();
 
   const onClickCloseButton = () => {
@@ -90,7 +93,12 @@ const SoundModal = (props: SoundModalProps) => {
                   <Tr key={index}>
                     <Td>{sound.displayName}</Td>
                     <Td>
-                      <PlayPauseButton path={sound.path} />
+                      <PlayPauseButton
+                        onClick={() => handleSelectAndPlay(sound)}
+                        isPlaying={
+                          activeSoundInfo?.path === sound.path && isPlaying
+                        }
+                      />
                     </Td>
                   </Tr>
                 ))}
